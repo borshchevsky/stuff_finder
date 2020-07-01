@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% include 'slider.html' %}
+<table class="table">
+    <tbody>
+    <tr>
+        <th scope="col"><h5>Общие характеристики</h5></th>
+        <th scope="col"></th>
+    </tr>
+
+    <tr>
+        <td scope="col">Название</td>
+        <td scope="col">{{ phone.name}}</td>
+    </tr>
+    {% if phone.os %}
+    <tr>
+        <td scope="col">ОС</td>
+        <td scope="col">{{ phone.os }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.num_of_sims %}
+    <tr>
+        <td scope="col">Количество SIM-карт</td>
+        <td scope="col">{{ phone.num_of_sims }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.sim_type %}
+    <tr>
+        <td scope="col">Тип SIM-карты</td>
+        <td scope="col">{{ phone.sim_type }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.weight %}
+    <tr>
+        <td scope="col">Вес, г</td>
+        <td scope="col">{{ phone.weight }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.size %}
+    <tr>
+        <td scope="col">Размер, мм</td>
+        <td scope="col">{{ phone.size.replace(',','x') }}</td>
+    </tr>
+    {% endif %}
+
+
+    <tr>
+        <th scope="col"><h5>Экран</h5></th>
+        <th scope="col"></th>
+    </tr>
+
+    {% if phone.screen_type %}
+    <tr>
+        <td scope="col">Тип экрана</td>
+        <td scope="col">{{ phone.screen_type }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.screen_size %}
+    <tr>
+        <td scope="col">Размер экрана</td>
+        <td scope="col">{{ phone.screen_size }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.resolution %}
+    <tr>
+        <td scope="col">Разрешение экрана</td>
+        <td scope="col">{{ phone.resolution }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.PPI %}
+    <tr>
+        <td scope="col">PPI</td>
+        <td scope="col">{{ phone.ppi }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.ips %}
+    <tr>
+        <td scope="col">IPS-экран</td>
+        <td scope="col">{{ phone.ips }}</td>
+    </tr>
+    {% endif %}
+
+    </tbody>
+</table>
+{% endblock %}

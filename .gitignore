@@ -1,0 +1,11 @@
+.idea/
+test.py
+venv/
+__pycache__/
+etc.py
+stuff_finder.log
+sf.db
+photos
+env/
+sf_db.xml
+webapp/static

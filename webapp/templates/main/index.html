@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Название</th>
+          <th scope="col">ОС</th>
+          <th scope="col">Вес, г</th>
+        </tr>
+      </thead>
+      <tbody>
+       {% for phone in phones %}
+            <tr>
+              <td><a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a></td>
+              <td>{{ phone.os }}</td>
+              <td>{{ phone.weight }}</td>
+            </tr>
+       {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
