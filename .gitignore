@@ -9,3 +9,4 @@ photos
 env/
 sf_db.xml
 webapp/static
+sf.log
