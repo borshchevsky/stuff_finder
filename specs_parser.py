@@ -147,14 +147,14 @@ class MtsParser(BaseParser):
 
     def download_images(self):
         counter = 0
+        dirpath = os.path.join('webapp', 'static')
+        os.makedirs(dirpath, exist_ok=True)
         for item in Phone.query.order_by(Phone.name.desc()).all():
             if item.photos:
                 for n, photo in enumerate(item.photos.split(','), start=1):
                     if not photo.endswith('jpg'):
                         continue
                     name = item.name.replace("/", "").strip()
-                    dirpath = os.path.join('photos', name)
-                    os.makedirs(dirpath, exist_ok=True)
                     filename = f'{name} {n}.jpg'
                     fullpath = os.path.join(dirpath, filename)
                     if os.path.isfile(fullpath):

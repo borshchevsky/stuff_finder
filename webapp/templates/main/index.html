@@ -1,22 +1,47 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Название</th>
-          <th scope="col">ОС</th>
-          <th scope="col">Вес, г</th>
-        </tr>
-      </thead>
-      <tbody>
-       {% for phone in phones %}
+    {% include 'main/search.html' %}
+    {% if not nothing_found %}
+        <table class="table">
+          <thead style="width:500px;">
             <tr>
-              <td><a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a></td>
-              <td>{{ phone.os }}</td>
-              <td>{{ phone.weight }}</td>
+              <th scope="col">Название</th>
+              <th scope="col">ОС</th>
+              <th scope="col">Цена</th>
             </tr>
-       {% endfor %}
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+           {% for phone in phones %}
+                <tr>
+                  <td style="width:800px;"><a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a></td>
+                  <td>{{ phone.os }}</td>
+                  <td>
+                      {% if phone.shops %}
+                        {% set prices = [] %}
+                        {% for shop in phone.shops %}
+                            {% if prices.append(shop.price) %}
+                            {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                      {% set prices = prices|sort %}
+                      {% if prices %}
+                        {% set price = prices[0]|round|int %}
+                        {{ price }}
+                      {% endif %}
+                  </td>
+                </tr>
+           {% endfor %}
+          </tbody>
+        </table>
+    {% else %}
+        <br>
+        <br>
+        <div align="center">
+            <img style="width:500px;" src="https://i.gyazo.com/f7cf40e4758b2d26cf1d223c024dae81.png" alt="">
+        </div>
+        <br>
+        <br>
+        <h5 align="center">Ничего не найдено :(</h5>
+    {% endif %}
 {% endblock %}
