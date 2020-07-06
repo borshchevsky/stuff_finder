@@ -1,5 +1,4 @@
 from flask import Flask
-
 from models import db
 
 from webapp.main.views import blueprint as main_blueprint

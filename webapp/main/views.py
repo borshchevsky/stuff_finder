@@ -15,6 +15,7 @@ def index():
     title = 'Stuff Finder'
     text = request.args.get('search')
     nothing_found = True
+
     if text:
         all_phones = Phone.query.all()
         phones = []
@@ -30,11 +31,23 @@ def index():
             phones = [i[0] for i in sorted(phones, key=lambda x: x[1], reverse=True)]
         if phones:
             nothing_found = False
-        return render_template('main/index.html', page_title=title, phones=phones, form=form,
+        return render_template('main/index.html', page_title=title, phones=get_prices(phones), form=form,
                                nothing_found=nothing_found)
+
     nothing_found = False
     phones = Phone.query.all()
-    return render_template('main/index.html', page_title=title, phones=phones, form=form, nothing_found=nothing_found)
+    return render_template('main/index.html', page_title=title, phones=get_prices(phones), form=form,
+                           nothing_found=nothing_found)
+
+
+def get_prices(phones):
+    """ Функция формирует словарь {телефон: минимальная_цена} для последующего вывода в шаблоне"""
+
+    out = {}
+    for phone in phones:
+        prices = [round(shop.price) for shop in phone.shops]
+        out[phone] = min(prices) if prices else None
+    return out
 
 
 @blueprint.route('/specs')

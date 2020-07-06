@@ -7,27 +7,16 @@
           <thead style="width:500px;">
             <tr>
               <th scope="col">Название</th>
-              <th scope="col">ОС</th>
-              <th scope="col">Цена</th>
+              <th scope="col">Цена, р</th>
             </tr>
           </thead>
           <tbody>
            {% for phone in phones %}
                 <tr>
                   <td style="width:800px;"><a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a></td>
-                  <td>{{ phone.os }}</td>
                   <td>
-                      {% if phone.shops %}
-                        {% set prices = [] %}
-                        {% for shop in phone.shops %}
-                            {% if prices.append(shop.price) %}
-                            {% endif %}
-                        {% endfor %}
-                      {% endif %}
-                      {% set prices = prices|sort %}
-                      {% if prices %}
-                        {% set price = prices[0]|round|int %}
-                        {{ price }}
+                      {% if phones[phone] %}
+                        {{ phones[phone] }}
                       {% endif %}
                   </td>
                 </tr>
@@ -45,3 +34,11 @@
         <h5 align="center">Ничего не найдено :(</h5>
     {% endif %}
 {% endblock %}
+
+
+
+
+
+
+
+
