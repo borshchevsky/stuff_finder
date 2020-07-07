@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 import requests
 
 from models import db, Phone, normalize_name
-from parsers import BaseParser
 from webapp import create_app
 
 logging.basicConfig(
@@ -19,7 +18,7 @@ logging.basicConfig(
 '''Парсер для загрузки характеристик в карточку товара'''
 
 
-class MtsParser(BaseParser):
+class SpecsParser():
     URL = 'https://shop.mts.ru'
     SLEEP_TIME = 1
 
@@ -65,10 +64,7 @@ class MtsParser(BaseParser):
             except(IndexError, ValueError):
                 break
         img_string = ','.join(iter(img_list))
-        data = {}
-        data['name'] = name_tag['content']
-        data['url'] = url
-        data['images'] = img_string
+        data = {'name': name_tag['content'], 'url': url, 'images': img_string}
         for item in all_data:
             names = item.find_all('td', class_='name')
             values = item.find_all('td', class_='value')
@@ -124,13 +120,13 @@ class MtsParser(BaseParser):
         return phone
 
     def parse_all(self):
-        mts = MtsParser()
-        ids = mts.parse_ids(1, 25)
+        parser = SpecsParser()
+        ids = parser.parse_ids(1, 25)
         items_added = 0
         for n, i in enumerate(ids):
-            data = mts.get_specs(i)
-            item = mts.process_data(data)
-            if mts.save_to_db(item):
+            data = parser.get_specs(i)
+            item = parser.process_data(data)
+            if parser.save_to_db(item):
                 items_added += 1
             sys.stdout.write('\r')
             percent_done = round((n / len(ids)) * 100, 2)
@@ -173,5 +169,5 @@ class MtsParser(BaseParser):
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        # MtsParser().parse_all()
-        MtsParser().download_images()
+        # SpecsParser().parse_all()
+        SpecsParser().download_images()

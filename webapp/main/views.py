@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, render_template, request
 from fuzzywuzzy import fuzz
 
-from models import Phone, normalize_name
+from models import Phone, PhoneShop, Shop, normalize_name
 
 from webapp.user.forms import SearchForm
 
@@ -54,4 +54,16 @@ def get_prices(phones):
 def show_specs():
     phone_id = request.args.get('phone_id', None)
     phone = Phone.query.filter_by(id=phone_id).first()
-    return render_template('main/specs.html', phone=phone)
+    price_queries = PhoneShop.query.filter_by(phone_id=phone_id).all()
+    prices = []
+    for query in price_queries:
+        shop = Shop.query.filter_by(id=query.shop_id).first()
+
+        price = str(round(query.price))
+        price = price[:len(price) - 3] + ' ' + price[-3:]
+        shop_name = shop.name
+        url = shop.phones_path + query.external_id
+        prices.append([shop_name, price, url])
+    if not prices:
+        prices = [[], [], []]
+    return render_template('main/specs.html', phone=phone, prices=prices)

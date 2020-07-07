@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-
 {% block content %}
     {% include 'main/search.html' %}
     {% if not nothing_found %}
-        <table class="table">
-          <thead style="width:500px;">
+        <table class="table table-hover">
+          <thead>
             <tr>
+              <th scope="col"></th>
               <th scope="col">Название</th>
               <th scope="col">Цена, р</th>
             </tr>
@@ -13,7 +13,14 @@
           <tbody>
            {% for phone in phones %}
                 <tr>
-                  <td style="width:800px;"><a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a></td>
+                  <td style="max-width:20px;">
+                      <div align="center">
+                          <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
+                      </div>
+                  </td>
+                  <td align="left" style="width:800px;">
+                      <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
+                  </td>
                   <td>
                       {% if phones[phone] %}
                         {{ phones[phone] }}

@@ -69,6 +69,7 @@ class PhoneShop(db.Model):
     phone_id = db.Column(db.Integer, db.ForeignKey('phone.id'))
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     price = db.Column(db.Float)
+    test = db.Column(db.String)
     external_id = db.Column(db.String, unique=True)
 
 
