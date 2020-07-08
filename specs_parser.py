@@ -121,7 +121,7 @@ class SpecsParser():
 
     def parse_all(self):
         parser = SpecsParser()
-        ids = parser.parse_ids(1, 25)
+        ids = parser.parse_ids()
         items_added = 0
         for n, i in enumerate(ids):
             data = parser.get_specs(i)
@@ -167,7 +167,8 @@ class SpecsParser():
 
 
 if __name__ == '__main__':
-    app = create_app()
-    with app.app_context():
-        # SpecsParser().parse_all()
-        SpecsParser().download_images()
+    print(SpecsParser().get_specs('/smartfon-apple-iphone-11-128gb-chernyj'))
+    # app = create_app()
+    # with app.app_context():
+    #     SpecsParser().parse_all()
+    #     # SpecsParser().download_images()

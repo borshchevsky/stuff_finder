@@ -45,7 +45,7 @@ def get_prices(phones):
 
     out = {}
     for phone in phones:
-        prices = [round(shop.price) for shop in phone.shops]
+        prices = [round(shop.price) for shop in phone.shops if shop.price]
         out[phone] = min(prices) if prices else None
     return out
 
@@ -58,7 +58,8 @@ def show_specs():
     prices = []
     for query in price_queries:
         shop = Shop.query.filter_by(id=query.shop_id).first()
-
+        if not query.price:
+            continue
         price = str(round(query.price))
         price = price[:len(price) - 3] + ' ' + price[-3:]
         shop_name = shop.name

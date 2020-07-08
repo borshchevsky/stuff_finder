@@ -70,7 +70,7 @@ class PhoneShop(db.Model):
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     price = db.Column(db.Float)
     test = db.Column(db.String)
-    external_id = db.Column(db.String, unique=True)
+    external_id = db.Column(db.String)
 
 
 user_phone = db.Table(
@@ -114,6 +114,25 @@ class Shop(db.Model):
 
 def normalize_name(name):
     bad_words = {'смартфон', 'мобильный', 'телефон'}
+    replace_dict = {
+        'красный': 'red',
+        'синий': 'blue',
+        'черный': 'black',
+        'серый': 'grey',
+        'зеленый': 'green',
+        'зелёный': 'green',
+        'коричневый': 'brown',
+        'золотистый': 'gold',
+        'золотой': 'gold',
+    }
     words = name.split()
-    return ' '.join(word for word in words if word.lower() not in bad_words)
+    result = ' '.join(word for word in words if word.lower() not in bad_words)
+    for replace_what, replace_to in replace_dict.items():
+        result = result.replace(replace_what, replace_to)
+    if 'gb' in result.lower() and result.find(' gb') == -1:
+        index = result.lower().find('gb')
+        result = result[:index] + ' ' + result[index:]
+    return result
 
+if __name__ == '__main__':
+    print(normalize_name('Xiaomi Redmi Note 8T 4/64Gb Moonshadow Grey'))

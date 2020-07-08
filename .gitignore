@@ -4,8 +4,6 @@ venv/
 __pycache__/
 etc.py
 stuff_finder.log
-photos
 env/
 sf_db.xml
-webapp/static
 sf.log

@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 
-from models import db
+from models import db, Shop
 from webapp.main.views import blueprint as main_blueprint
 
 
@@ -13,3 +13,4 @@ def create_app():
 
     app.register_blueprint(main_blueprint)
     return app
+
