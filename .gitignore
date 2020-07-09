@@ -7,3 +7,4 @@ stuff_finder.log
 env/
 sf_db.xml
 sf.log
+webapp/static

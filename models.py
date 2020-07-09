@@ -1,5 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
 import logging
+
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
 
 db = SQLAlchemy()
 
@@ -80,16 +83,23 @@ user_phone = db.Table(
 )
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120))
     name = db.Column(db.String(120))
     last_name = db.Column(db.String(120))
     email = db.Column(db.String(120))
-    password = db.Column(db.String(120))
+    password = db.Column(db.String)
     favorites = db.relationship('Phone', secondary=user_phone)
 
     def __repr__(self):
         return f'<User class {self.name}>'
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
 
 
 class Shop(db.Model):
@@ -134,5 +144,6 @@ def normalize_name(name):
         result = result[:index] + ' ' + result[index:]
     return result
 
+
 if __name__ == '__main__':
-    print(normalize_name('Xiaomi Redmi Note 8T 4/64Gb Moonshadow Grey'))
+    print(generate_password_hash('asd'))

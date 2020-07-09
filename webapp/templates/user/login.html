@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="signin.css" rel="stylesheet">
+<div style="position:fixed;left:44%;top:30%" align="center">
+    <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
+    <form class="form-signin" action="" method="post" style="max-width:250px;align:center">
+        {{ form.hidden_tag() }}
+            {{ form.username() }}
+            {{ form.password() }}
+        <div class="checkbox mb-3">
+            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        </div>
+        <p>{{ form.submit()}}</p>
+        <p><a href="{{ url_for('user.register') }}">Регистрация</a></p>
+    </form>
+</div>
+{% endblock %}

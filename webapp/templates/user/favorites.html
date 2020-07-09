@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+{% if not phones%}
+    Список избранных пуст.
+{% else %}
+    {% for phone in phones %}
+        <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
+        <div align="right">
+            <a href="{{ url_for('user.favorites', phone_id=phone.id, action='del') }}">Удалить</a>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}

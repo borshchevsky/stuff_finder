@@ -1,4 +1,5 @@
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, render_template, request
+from flask_login import login_required
 from fuzzywuzzy import fuzz
 
 from models import Phone, PhoneShop, Shop, normalize_name
