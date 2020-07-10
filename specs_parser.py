@@ -110,9 +110,20 @@ class SpecsParser():
         phone.aperture = data.get('Диафрагма основной камеры')
         phone.selfie_aperture = data.get('Диафрагма фронтальной камеры')
         phone.selfie_cam_resolution = data.get('Разрешение фронтальной камеры')
+        phone.flash = data.get('Встроенная вспышка')
         phone.max_video_resolution = data.get('Разрешение видеосъемки основной камеры (макс)')
+        phone.selfie_cam = data.get('Разрешение видеосъемки фронтальной камеры (макс)')
+        phone.audio_formats = data.get('Поддержка звуковых форматов')
         phone.headphones_jack = data.get('Разъем для наушников')
+        phone.types = data.get('Стандарты сотовой связи')
+        phone.bluetooth_version = data.get('Bluetooth')
+        phone.battery_capacity = data.get('Емкость аккумулятора')
+        phone.charge_connector = data.get('Проводное соединение')
+        phone.quick_charge = data.get('Функции зарядки и энергопотребления')
         phone.processor = data.get('Процессор')
+        phone.processor_cores = data.get('Количество ядер')
+        phone.ram = data.get('Объем оперативной памяти')
+        phone.sdcard_slot = data.get('Слот для карты памяти')
         try:
             phone.sdcard_slot = data.get('Слот для карты памяти').lower()
         except AttributeError:
@@ -167,8 +178,7 @@ class SpecsParser():
 
 
 if __name__ == '__main__':
-    print(SpecsParser().get_specs('/smartfon-apple-iphone-11-128gb-chernyj'))
-    # app = create_app()
-    # with app.app_context():
-    #     SpecsParser().parse_all()
+    app = create_app()
+    with app.app_context():
+        SpecsParser().parse_all()
     #     # SpecsParser().download_images()

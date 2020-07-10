@@ -30,7 +30,7 @@ class RegistrationForm(FlaskForm):
         'Повторите пароль',
         validators=[DataRequired(),EqualTo('password', message='Пароли должны совпадать')],
         render_kw={'class': 'form-control', 'placeholder': 'Повторите пароль'})
-    submit = SubmitField('Зарегистрироваться', render_kw={'class': 'btn btn-primary'})
+    submit = SubmitField('Отправить', render_kw={'class': 'btn btn-primary'})
 
     def validate_username(self, username):
         if User.query.filter_by(username=username.data).count():

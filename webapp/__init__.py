@@ -2,7 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
-from models import db, Shop, User
+from models import db, User, Phone
 from webapp.main.views import blueprint as main_blueprint
 from webapp.user.views import blueprint as user_blueprint
 
@@ -26,7 +26,7 @@ def create_app():
 
     @app.shell_context_processor
     def make_shell_context():
-        return {'db': db, 'User': User}
+        return {'db': db, 'User': User, 'Phone': Phone}
 
     return app
 

@@ -83,6 +83,143 @@
     </tr>
     {% endif %}
 
+    <tr>
+        <th><h5><br>Мультимедиа</h5></th>
+        <th></th>
+    </tr>
+
+    {% if phone.main_cam_resolution %}
+    <tr>
+        <td>Разрешение камеры</td>
+        <td>{{ phone.main_cam_resolution }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.selfie_cam_resolution %}
+    <tr>
+        <td>Расширение фронтальной камеры</td>
+        <td>{{ phone.selfie_cam_resolution }}</td>
+    </tr>
+    {% endif %}
+    {% if phone.aperture %}
+        <tr>
+            <td>Диафрагма основной камеры</td>
+            <td>{{ phone.aperture }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.selfie_aperture %}
+        <tr>
+            <td>Диафрагма фронтальной камеры</td>
+            <td>{{ phone.selfie_aperture }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.flash %}
+        <tr>
+            <td>Вспышка</td>
+            <td>{{ phone.flash }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.max_video_resolution %}
+        <tr>
+            <td>Максимальное разрешение видео</td>
+            <td>{{ phone.max_video_resolution }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.selfie_cam %}
+        <tr>
+            <td>Максимальное разрешение видео с фронтальной камеры</td>
+            <td>{{ phone.selfie_cam }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.audio_formats %}
+        <tr>
+            <td>Форматы аудио</td>
+            <td>{{ phone.audio_formats }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.headphones_jack %}
+        <tr>
+            <td>Разъем для наушников</td>
+            <td>{{ phone.headphones_jack }}</td>
+        </tr>
+    {% endif %}
+
+    <tr>
+        <th><h5><br>Связь</h5></th>
+        <th></th>
+    </tr>
+
+    {% if phone.types %}
+        <tr>
+            <td>Стандарты сотовой связи</td>
+            <td>{{ phone.types }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.bluetooth_version %}
+        <tr>
+            <td>Версия bluetooth</td>
+            <td>{{ phone.bluetooth_version }}</td>
+        </tr>
+    {% endif %}
+
+    <tr>
+        <th><h5><br>Батарея</h5></th>
+        <th></th>
+    </tr>
+
+    {% if phone.battery_capacity %}
+        <tr>
+            <td>Емкость аккмумулятора</td>
+            <td>{{ phone.battery_capacity }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.charge_connector %}
+        <tr>
+            <td>Тим разъема для зарядки</td>
+            <td>{{ phone.charge_connector }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.quick_charge %}
+        <tr>
+            <td>Функции зарядки и энергопотребления</td>
+            <td>{{ phone.quick_charge }}</td>
+        </tr>
+    {% endif %}
+
+    <tr>
+        <th><h5><br>Память и процессор</h5></th>
+        <th></th>
+    </tr>
+
+    {% if phone.processor %}
+        <tr>
+            <td>Процессор</td>
+            <td>{{ phone.processor }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.processor_cores %}
+        <tr>
+            <td>Количество ядер</td>
+            <td>{{ phone.processor_cores }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.gpu %}
+        <tr>
+            <td>Видеопроцессор</td>
+            <td>{{ phone.gpu }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.ram %}
+        <tr>
+            <td>Объем оперативной памяти</td>
+            <td>{{ phone.ram }}</td>
+        </tr>
+    {% endif %}
+    {% if phone.sdcard_slot %}
+        <tr>
+            <td>Слот для SD-карты</td>
+            <td>{{ phone.sdcard_slot }}</td>
+        </tr>
+    {% endif %}
 </table>
 
 {% if prices[0] %}

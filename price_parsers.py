@@ -23,7 +23,7 @@ class CitilinkParser():
         page = self.START_PAGE
         prices = []
         Price = namedtuple('Price', 'name price external_id')
-        print('Parsing citilink...')
+        print('Parsing Citilink...')
         headers = {'User-Agent': 'Mozilla/5.0'}
         while page <= self.END_PAGE:
             sys.stdout.write('\r')
@@ -96,7 +96,7 @@ class EldoradoParser():
         page = start_page
         info = []
         collected = 0
-        print('Parsing eldorado...')
+        print('Parsing Eldorado...')
         while page <= self.END_PAGE:
             sys.stdout.write('\r')
             print(f'Page: {page}', end='')
@@ -266,6 +266,6 @@ class MtsParser():
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        # MtsParser().update_db()
-        # EldoradoParser().update_db()
         CitilinkParser().update_db()
+        EldoradoParser().update_db()
+        MtsParser().update_db()

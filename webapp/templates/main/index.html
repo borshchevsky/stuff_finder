@@ -5,46 +5,67 @@
     <a href="{{ url_for('user.favorites') }}">Избранное</a>
 </div>
 {% endif %}
+
 {% include 'main/search.html' %}
+
 {% if not nothing_found %}
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th scope="col"></th>
-        <th scope="col">Название</th>
-        <th scope="col">Цена, р</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for phone in phones %}
-    <tr>
-        <td style="max-width:20px;">
-            <div align="center">
-                <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
-            </div>
-        </td>
-        <td align="left" style="width:800px;">
-            <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
-        </td>
-        <td>
-            {% if phones[phone] %}
-            {{ phones[phone] }}
+
+    {% if prev_url %}
+        <a href="{{ prev_url }}">Предыдущая страница | </a>
+    {% endif %}
+    {% if next_url %}
+        <a href="{{ next_url }}">Следующая страница</a>
+    {% endif %}
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Название</th>
+            <th scope="col">Цена, р</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for phone in phones %}
+        <tr>
+            <td style="max-width:20px;">
+                <div align="center">
+                    <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
+                </div>
+            </td>
+            <td align="left" style="width:800px;">
+                <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
+            </td>
+            <td>
+                {% if phones[phone] %}
+                  {{ phones[phone] }}
+                {% endif %}
+            </td>
+            {% if current_user.is_authenticated %}
+                <td><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}" title="Добавить в избранное">+</a></td>
             {% endif %}
-        </td>
-        <td><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}">+</a></td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if prev_url %}
+        <a href="{{ prev_url }}">Предыдущая страница | </a>
+    {% endif %}
+    {% if next_url %}
+        <a href="{{ next_url }}">Следующая страница</a>
+    {% endif %}
+<br>
+<br>
+<br>
 {% else %}
-<br>
-<br>
-<div align="center">
-    <img style="width:500px;" src="https://i.gyazo.com/f7cf40e4758b2d26cf1d223c024dae81.png" alt="">
-</div>
-<br>
-<br>
-<h5 align="center">Ничего не найдено :(</h5>
+    <br>
+    <br>
+    <div align="center">
+        <img style="width:500px;" src="https://i.gyazo.com/f7cf40e4758b2d26cf1d223c024dae81.png" alt="">
+    </div>
+    <br>
+    <br>
+    <h5 align="center">Ничего не найдено :(</h5>
 {% endif %}
 {% endblock %}
 

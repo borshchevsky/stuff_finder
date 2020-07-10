@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, url_for
 from flask_login import login_required
 from fuzzywuzzy import fuzz
 
 from models import Phone, PhoneShop, Shop, normalize_name
+from webapp.config import ITEMS_PER_PAGE
 
 from webapp.user.forms import SearchForm
 
@@ -36,9 +37,13 @@ def index():
                                nothing_found=nothing_found)
 
     nothing_found = False
-    phones = Phone.query.all()
-    return render_template('main/index.html', page_title=title, phones=get_prices(phones), form=form,
-                           nothing_found=nothing_found)
+    page = request.args.get('page', 1, type=int)
+    phones = Phone.query.paginate(page, ITEMS_PER_PAGE, False)
+    next_url = url_for('main.index', page=phones.next_num) if phones.has_next else None
+    prev_url = url_for('main.index', page=phones.prev_num) if phones.has_prev else None
+
+    return render_template('main/index.html', page_title=title, phones=get_prices(phones.items), form=form,
+                           nothing_found=nothing_found, next_url=next_url, prev_url=prev_url)
 
 
 def get_prices(phones):
