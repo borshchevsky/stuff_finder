@@ -63,7 +63,7 @@ class CitilinkParser():
             print(f'Percent done: {percent_done} %', end='')
             fuzzed_phones = {}
 
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=1).count():
+            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
                 p = PhoneShop.query.filter_by(external_id=item.external_id).first()
                 if p.price != item.price:
                     PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
@@ -75,8 +75,9 @@ class CitilinkParser():
                         fuzzed_phones[phone] = ratio_w
                 if fuzzed_phones:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=1).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price, external_id=item.external_id)
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
+                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
+                                      external_id=item.external_id)
                         db.session.add(p)
                         added += 1
                 else:
@@ -91,7 +92,6 @@ class EldoradoParser():
     SLEEP_TIME = 1
     SHOP_NAME = 'Эльдорадо'
     END_PAGE = 17  # 17
-
     def parse_ids(self, start_page=1):
         page = start_page
         info = []
@@ -137,7 +137,7 @@ class EldoradoParser():
             print(f'Percent done: {percent_done} %', end='')
             name, price, external_id = info
             fuzzed_phones = {}
-            if PhoneShop.query.filter_by(external_id=external_id, shop_id=2).count():
+            if PhoneShop.query.filter_by(external_id=external_id, shop_id=shop_id).count():
                 p = PhoneShop.query.filter_by(external_id=external_id).first()
                 if p.price != price:
                     PhoneShop.query.filter_by(id=p.id).update({'price': price})
@@ -149,7 +149,7 @@ class EldoradoParser():
                         fuzzed_phones[phone] = ratio_w
                 if fuzzed_phones:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=2).count():
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
                         p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=price, external_id=external_id)
                         db.session.add(p)
                         added += 1
@@ -240,7 +240,7 @@ class MtsParser():
             print(f'Percent done: {percent_done} %', end='')
             fuzzed_phones = {}
 
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=3).count():
+            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
                 p = PhoneShop.query.filter_by(external_id=item.external_id).first()
                 if p.price != item.price:
                     PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
@@ -252,8 +252,9 @@ class MtsParser():
                         fuzzed_phones[phone] = ratio_w
                 if fuzzed_phones:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=3).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price, external_id=item.external_id)
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
+                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
+                                      external_id=item.external_id)
                         db.session.add(p)
                         added += 1
                 else:
