@@ -5,10 +5,6 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from models import User
 
 
-class SearchForm(FlaskForm):
-    search = StringField(render_kw={'class': 'form-control mr-sm-2'})
-    search_button = SubmitField('Найти', render_kw={'class': 'btn btn-outline-success my-2 my-sm-0'})
-
 
 class LoginForm(FlaskForm):
     username = StringField('Имя', validators=[DataRequired()],

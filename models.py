@@ -15,9 +15,11 @@ logging.basicConfig(
 
 
 class Phone(db.Model):
-    # Общие характеристики
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=True, unique=True)
+    views = db.Column(db.Integer)
+
+    # Общие характеристики
     photos = db.Column(db.String, nullable=True)
     os = db.Column(db.String, nullable=True)
     num_of_sims = db.Column(db.String, nullable=True)

@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, request, url_for
-from flask_login import login_required
 from fuzzywuzzy import fuzz
 
-from models import Phone, PhoneShop, Shop, normalize_name
+
+from models import db, Phone, PhoneShop, Shop, normalize_name
 from webapp.config import ITEMS_PER_PAGE
 
-from webapp.user.forms import SearchForm
 
 blueprint = Blueprint('main', __name__)
 
@@ -13,7 +12,6 @@ blueprint = Blueprint('main', __name__)
 @blueprint.route('/')
 @blueprint.route('/index')
 def index():
-    form = SearchForm()
     title = 'Stuff Finder'
     text = request.args.get('search')
     nothing_found = True
@@ -33,7 +31,7 @@ def index():
             phones = [i[0] for i in sorted(phones, key=lambda x: x[1], reverse=True)]
         if phones:
             nothing_found = False
-        return render_template('main/index.html', page_title=title, phones=get_prices(phones), form=form,
+        return render_template('main/index.html', page_title=title, phones=get_prices(phones),
                                nothing_found=nothing_found)
 
     nothing_found = False
@@ -42,7 +40,7 @@ def index():
     next_url = url_for('main.index', page=phones.next_num) if phones.has_next else None
     prev_url = url_for('main.index', page=phones.prev_num) if phones.has_prev else None
 
-    return render_template('main/index.html', page_title=title, phones=get_prices(phones.items), form=form,
+    return render_template('main/index.html', page_title=title, phones=get_prices(phones.items),
                            nothing_found=nothing_found, next_url=next_url, prev_url=prev_url)
 
 
@@ -60,6 +58,11 @@ def get_prices(phones):
 def show_specs():
     phone_id = request.args.get('phone_id', None)
     phone = Phone.query.filter_by(id=phone_id).first()
+    if not phone:
+        return render_template('errors/404.html')
+    views = 1 if not phone.views else phone.views + 1
+    Phone.query.filter_by(id=phone.id).update({'views': views})
+    db.session.commit()
     price_queries = PhoneShop.query.filter_by(phone_id=phone_id).all()
     prices = []
     for query in price_queries:
