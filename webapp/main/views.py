@@ -1,10 +1,8 @@
 from flask import Blueprint, render_template, request, url_for
 from fuzzywuzzy import fuzz
 
-
 from models import db, Phone, PhoneShop, Shop, normalize_name
 from webapp.config import ITEMS_PER_PAGE
-
 
 blueprint = Blueprint('main', __name__)
 
@@ -14,10 +12,14 @@ blueprint = Blueprint('main', __name__)
 def index():
     title = 'Stuff Finder'
     text = request.args.get('search')
+    how = request.args.get('how')
     nothing_found = True
 
     if text:
-        all_phones = Phone.query.all()
+        if how == 'pop':
+            all_phones = Phone.query.order_by(Phone.views).all()
+        else:
+            all_phones = Phone.query.all()
         phones = []
         for phone in all_phones:
             ratio1 = fuzz.partial_ratio(normalize_name(phone.name), text)
@@ -36,11 +38,24 @@ def index():
 
     nothing_found = False
     page = request.args.get('page', 1, type=int)
-    phones = Phone.query.paginate(page, ITEMS_PER_PAGE, False)
+    if how == 'pop':
+        phones = Phone.query.order_by(Phone.views.desc()).paginate(page, ITEMS_PER_PAGE, False)
+    elif how == 'price':
+        phones = db.session.query(PhoneShop.phone_id, db.func.min(PhoneShop.price).label('min_price')) \
+            .group_by(PhoneShop.phone_id).order_by(PhoneShop.price.desc()).paginate(page, ITEMS_PER_PAGE, False)
+    else:
+        phones = Phone.query.paginate(page, ITEMS_PER_PAGE, False)
     next_url = url_for('main.index', page=phones.next_num) if phones.has_next else None
     prev_url = url_for('main.index', page=phones.prev_num) if phones.has_prev else None
+    if how == 'price':
+        phones_price_sorted = {}
+        for item in phones.items:
+            phones_price_sorted[Phone.query.filter_by(id=item.phone_id).first()] = item.min_price
+        phones = phones_price_sorted
+    else:
+        phones = get_prices(phones.items)
 
-    return render_template('main/index.html', page_title=title, phones=get_prices(phones.items),
+    return render_template('main/index.html', page_title=title, phones=phones,
                            nothing_found=nothing_found, next_url=next_url, prev_url=prev_url)
 
 

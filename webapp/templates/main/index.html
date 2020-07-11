@@ -21,8 +21,8 @@
         {% endif %}
     </div>
     <div align="right">
-        <a href="">По популярности</a>
-        <a href="">По цене</a>
+        <a href="{{ url_for('main.index', how='pop') }}">По популярности</a>
+        <a href="{{ url_for('main.index', how='price') }}">По цене</a>
     </div>
     <table class="table table-hover">
         <thead>
