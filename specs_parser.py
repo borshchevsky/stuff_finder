@@ -18,11 +18,11 @@ logging.basicConfig(
 '''Парсер для загрузки характеристик в карточку товара'''
 
 
-class SpecsParser():
+class SpecsParser:
     URL = 'https://shop.mts.ru'
     SLEEP_TIME = 1
 
-    def parse_ids(self, start_page=1, end_page=25):
+    def parse_ids(self, start_page=1, end_page=25):  # end_page = 25
         page = start_page
         ids = []
         print('Parsing...')
@@ -181,4 +181,4 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         SpecsParser().parse_all()
-    #     # SpecsParser().download_images()
+        # SpecsParser().download_images()
