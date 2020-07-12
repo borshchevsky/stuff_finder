@@ -42,7 +42,8 @@ def index():
         phones = Phone.query.order_by(Phone.views.desc()).paginate(page, ITEMS_PER_PAGE, False)
     elif how == 'price':
         phones = db.session.query(PhoneShop.phone_id, db.func.min(PhoneShop.price).label('min_price')) \
-            .group_by(PhoneShop.phone_id).order_by(PhoneShop.price.desc()).paginate(page, ITEMS_PER_PAGE, False)
+            .group_by(PhoneShop.phone_id, PhoneShop.price).order_by(PhoneShop.price.desc())\
+            .paginate(page, ITEMS_PER_PAGE, False)
     else:
         phones = Phone.query.paginate(page, ITEMS_PER_PAGE, False)
     next_url = url_for('main.index', page=phones.next_num) if phones.has_next else None
@@ -50,13 +51,13 @@ def index():
     if how == 'price':
         phones_price_sorted = {}
         for item in phones.items:
-            phones_price_sorted[Phone.query.filter_by(id=item.phone_id).first()] = item.min_price
+            phones_price_sorted[Phone.query.filter_by(id=item.phone_id).first()] = round(item.min_price)
         phones = phones_price_sorted
     else:
         phones = get_prices(phones.items)
 
     return render_template('main/index.html', page_title=title, phones=phones,
-                           nothing_found=nothing_found, next_url=next_url, prev_url=prev_url)
+                           nothing_found=nothing_found, next_url=next_url, prev_url=prev_url, how=how)
 
 
 def get_prices(phones):

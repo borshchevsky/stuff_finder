@@ -11,13 +11,21 @@
 {% if not nothing_found %}
     <div>
         {% if prev_url %}
-            <a href="{{ prev_url }}">Предыдущая страница </a>
+            {% if how %}
+                <a href="{{ prev_url }}&how={{ how }}">Предыдущая страница</a>
+            {% else %}
+                <a href="{{ prev_url }}">Предыдущая страница </a>
+            {% endif %}
         {% endif %}
         {% if prev_url and next_url %}
             |
         {% endif %}
         {% if next_url %}
-            <a href="{{ next_url }}">Следующая страница</a>
+            {% if how %}
+                <a href="{{ next_url }}&how={{ how }}">Следующая страница</a>
+            {% else %}
+                <a href="{{ next_url }}">Следующая страница</a>
+            {% endif%}
         {% endif %}
     </div>
     <div align="right">

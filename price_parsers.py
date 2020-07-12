@@ -268,5 +268,5 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         CitilinkParser().update_db()
-        EldoradoParser().update_db()
-        MtsParser().update_db()
+        # EldoradoParser().update_db()
+        # MtsParser().update_db()
