@@ -37,7 +37,7 @@ class CitilinkParser():
                 name = info['shortName']
                 if 'Как новый' in name:
                     continue
-                price = info['price']
+                price = float(info['price'])
                 external_id = info['id']
                 prices.append(Price(name, price, external_id))
             time.sleep(self.SLEEP_TIME)
@@ -270,7 +270,7 @@ class TechportParser():
     SLEEP_TIME = 1
     SHOP_NAME = 'Техпорт'
     START_PAGE = 1
-    END_PAGE = 7  # 28
+    END_PAGE = 9  # 9
 
     def parse_prices(self):
         page = self.START_PAGE
@@ -290,6 +290,9 @@ class TechportParser():
                 data = tag.find('a', class_='gtm-clk')
                 name = data['data-gtm-name']
                 price = data['data-gtm-price']
+                if not price:
+                    continue
+                price = float(price)
                 external_id = data['href']
                 prices.append(Price(name, price, external_id))
             time.sleep(self.SLEEP_TIME)
@@ -320,12 +323,13 @@ class TechportParser():
             if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
                 p = PhoneShop.query.filter_by(external_id=item.external_id).first()
                 if p.price != item.price:
+                    print(type(p.price), type(item.price))
                     PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
                     updated += 1
             else:
                 for phone in phones:
                     ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w > 86:
+                    if ratio_w >= 86:
                         fuzzed_phones[phone] = ratio_w
                 if fuzzed_phones:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
