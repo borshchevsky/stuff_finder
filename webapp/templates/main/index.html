@@ -9,8 +9,11 @@
 {% include 'main/search.html' %}
 
 {% if not nothing_found %}
-    <div>
-        {% if prev_url %}
+
+
+    <div class="p-t-20">
+
+                {% if prev_url %}
             {% if how %}
                 <a href="{{ prev_url }}&how={{ how }}">Предыдущая страница</a>
             {% else %}
@@ -27,17 +30,19 @@
                 <a href="{{ next_url }}">Следующая страница</a>
             {% endif%}
         {% endif %}
+        <span style="float:right;">
+        <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='pop') }}" style="font-size:12px;border-radius:0%;">По популярности</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='price') }}" style="font-size:12px;border-radius:0%;">По цене</a>
+            </span>
     </div>
-    <div align="right">
-        <a href="{{ url_for('main.index', how='pop') }}">По популярности</a>
-        <a href="{{ url_for('main.index', how='price') }}">По цене</a>
-    </div>
+<br>
+
     <table class="table table-hover">
         <thead>
         <tr>
             <th scope="col"></th>
             <th scope="col">Название</th>
-            <th scope="col">Цена, р</th>
+            <th scope="col">Цена, ₽</th>
         </tr>
         </thead>
         <tbody>
@@ -48,16 +53,17 @@
                     <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
                 </div>
             </td>
-            <td align="left" style="width:800px;">
-                <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
+            <td align="" style="width:800px;padding-left:50px;vertical-align:middle;">
+                <a style="font-size:16px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
             </td>
-            <td>
+            <td style="vertical-align:middle;font-size:15px;">
                 {% if phones[phone] %}
-                  {{ phones[phone] }}
+                    {% set ph = phones[phone]|string %}
+                    <strong>{{ ph[:ph|length - 3] + ' ' + ph[-3:] }}</strong>
                 {% endif %}
             </td>
             {% if current_user.is_authenticated %}
-                <td><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}" title="Добавить в избранное">+</a></td>
+                <td style="vertical-align:middle;"><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}" title="Добавить в избранное">+</a></td>
             {% endif %}
         </tr>
         {% endfor %}

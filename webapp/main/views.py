@@ -66,7 +66,7 @@ def get_prices(phones):
     out = {}
     for phone in phones:
         prices = [round(shop.price) for shop in phone.shops if shop.price]
-        out[phone] = min(prices) if prices else None
+        out[phone] = str(min(prices)) if prices else None
     return out
 
 
