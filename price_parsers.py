@@ -14,7 +14,7 @@ from webapp import create_app
 
 class CitilinkParser():
     URL = 'https://www.citilink.ru/catalog/mobile/smartfony/'
-    SLEEP_TIME = 1
+    SLEEP_TIME = 10
     SHOP_NAME = 'Ситилинк'
     START_PAGE = 1
     END_PAGE = 28  # 28
@@ -92,6 +92,7 @@ class EldoradoParser():
     SLEEP_TIME = 1
     SHOP_NAME = 'Эльдорадо'
     END_PAGE = 17  # 17
+
     def parse_ids(self, start_page=1):
         page = start_page
         info = []
@@ -264,9 +265,86 @@ class MtsParser():
         print(f'Done. Added {added} queries. Updated {updated} queries')
 
 
+class TechportParser():
+    URL = 'https://www.techport.ru/katalog/smartfony'
+    SLEEP_TIME = 1
+    SHOP_NAME = 'Техпорт'
+    START_PAGE = 1
+    END_PAGE = 7  # 28
+
+    def parse_prices(self):
+        page = self.START_PAGE
+        offset = 0
+        prices = []
+        Price = namedtuple('Price', 'name price external_id')
+        print('Parsing Techport...')
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        while page <= self.END_PAGE:
+            sys.stdout.write('\r')
+            print(f'Page: {page}', end='')
+            url = f'{self.URL}?offset={offset}'
+            r = requests.get(url, headers=headers)
+            parser = BeautifulSoup(r.text, 'html.parser')
+            tags = parser.find_all('div', class_='tcp-product-media')
+            for tag in tags:
+                data = tag.find('a', class_='gtm-clk')
+                name = data['data-gtm-name']
+                price = data['data-gtm-price']
+                external_id = data['href']
+                prices.append(Price(name, price, external_id))
+            time.sleep(self.SLEEP_TIME)
+            page += 1
+            offset += page * 28
+
+        print('\n')
+        print(f'Done. {len(prices)} prices collected.')
+        return prices
+
+    def update_db(self):
+        prices = self.parse_prices()
+        total_prices = len(prices)
+        n = 0
+        phones = Phone.query.all()
+        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
+        added = 0
+        updated = 0
+        print('\n')
+        print('Updating DB...')
+        for item in prices:
+            n += 1
+            percent_done = round(n / total_prices * 100, 2)
+            sys.stdout.write('\r')
+            print(f'Percent done: {percent_done} %', end='')
+            fuzzed_phones = {}
+
+            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
+                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
+                if p.price != item.price:
+                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
+                    updated += 1
+            else:
+                for phone in phones:
+                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
+                    if ratio_w > 86:
+                        fuzzed_phones[phone] = ratio_w
+                if fuzzed_phones:
+                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
+                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
+                                      external_id=item.external_id)
+                        db.session.add(p)
+                        added += 1
+                else:
+                    continue
+            db.session.commit()
+        print('\n')
+        print(f'Done. Added {added} queries. Updated {updated} queries')
+
+
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        CitilinkParser().update_db()
+        TechportParser().update_db()
+        # CitilinkParser().update_db()
         # EldoradoParser().update_db()
         # MtsParser().update_db()

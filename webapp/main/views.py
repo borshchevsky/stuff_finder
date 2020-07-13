@@ -92,4 +92,4 @@ def show_specs():
         prices.append([shop_name, price, url])
     if not prices:
         prices = [[], [], []]
-    return render_template('main/specs.html', phone=phone, prices=prices)
+    return render_template('main/specs.html', phone=phone, prices=prices, page_title=phone.name)
