@@ -76,3 +76,20 @@ def favorites():
     return render_template('user/favorites.html', title='Избранное', phones=phones)
 
 
+@blueprint.route('/login_test')
+def login_test():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if not (user and user.check_password(form.password.data)):
+            flash('Неверное имя или пароль.', category='danger')
+            return redirect(url_for('user.login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('main.index')
+        flash('Вы успешно вошли на сайт', category='success')
+        return redirect(next_page)
+    return render_template('user/login/login.html', form=form, title='Вход')

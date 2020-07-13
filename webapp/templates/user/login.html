@@ -1,18 +1,91 @@
-{% extends 'base.html' %}
+<html lang="en">
+<head>
+	<title>Вход</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="static/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/vendor/animate/animate.css">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="static/vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/vendor/animsition/css/animsition.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/vendor/select2/select2.min.css">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="static/vendor/daterangepicker/daterangepicker.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/css/util.css">
+	<link rel="stylesheet" type="text/css" href="static/css/main.css">
+<!--===============================================================================================-->
+</head>
+<body>
+	
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-50">
+				<form class="login100-form validate-form" method="post" action="">
+					{{ form.hidden_tag() }}
+					<span class="login100-form-title p-b-33">
+						Вход
+					</span>
 
-{% block content %}
-<link href="signin.css" rel="stylesheet">
-<div style="position:fixed;left:44%;top:30%" align="center">
-    <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
-    <form class="form-signin" action="" method="post" style="max-width:250px;align:center">
-        {{ form.hidden_tag() }}
-            {{ form.username() }}
-            {{ form.password() }}
-        <div class="checkbox mb-3">
-            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        </div>
-        <p>{{ form.submit()}}</p>
-        <p><a href="{{ url_for('user.register') }}">Регистрация</a></p>
-    </form>
-</div>
-{% endblock %}
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+
+						{{ form.username() }}
+						<span class="focus-input100-1"></span>
+						<span class="focus-input100-2"></span>
+					</div>
+
+					<div class="wrap-input100 rs1 validate-input" data-validate="Password is required">
+						{{ form.password() }}
+						<span class="focus-input100-1"></span>
+						<span class="focus-input100-2"></span>
+					</div>
+
+					<div class="container-login100-form-btn m-t-20">
+						{{ form.submit() }}
+					</div>
+
+					<div class="text-center p-t-45 p-b-4">
+						<span class="txt1">
+							Нет аккаунта?
+						</span>
+
+						<a href="{{ url_for('user.register') }}" class="txt2 hov1">
+							Зарегистрироваться
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+
+	
+<!--===============================================================================================-->
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/animsition/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+<!--===============================================================================================-->
+	<script src="js/main.js"></script>
+
+</body>
+</html>
