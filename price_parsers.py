@@ -38,6 +38,8 @@ class CitilinkParser():
                 if 'Как новый' in name:
                     continue
                 price = float(info['price'])
+                if not price:
+                    continue
                 external_id = info['id']
                 prices.append(Price(name, price, external_id))
             time.sleep(self.SLEEP_TIME)
@@ -111,6 +113,8 @@ class EldoradoParser():
             for value in phones.values():
                 name = value['name']
                 price = float(value['price'])
+                if not price:
+                    continue
                 external_id = value['code']
                 info.append([name, price, external_id])
                 collected += 1
@@ -329,7 +333,7 @@ class TechportParser():
             else:
                 for phone in phones:
                     ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w >= 86:
+                    if ratio_w > 86:
                         fuzzed_phones[phone] = ratio_w
                 if fuzzed_phones:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
