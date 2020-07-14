@@ -10,11 +10,12 @@ from fuzzywuzzy import fuzz
 
 from models import db, Phone, PhoneShop, Shop, normalize_name
 from webapp import create_app
+from webapp.config import PROXIES
 
 
 class CitilinkParser():
     URL = 'https://www.citilink.ru/catalog/mobile/smartfony/'
-    SLEEP_TIME = 10
+    SLEEP_TIME = 2
     SHOP_NAME = 'Ситилинк'
     START_PAGE = 1
     END_PAGE = 28  # 28
@@ -29,7 +30,7 @@ class CitilinkParser():
             sys.stdout.write('\r')
             print(f'Page: {page}', end='')
             url = f'{self.URL}?p={page}'
-            r = requests.get(url, headers=headers)
+            r = requests.get(url, headers=headers, proxies=PROXIES)
             parser = BeautifulSoup(r.text, 'html.parser')
             tags = parser.find_all('div', class_='subcategory-product-item')
             for item in tags:
@@ -170,10 +171,10 @@ class EldoradoParser():
 
 class MtsParser():
     URL = 'https://shop.mts.ru'
-    SLEEP_TIME = 1
+    SLEEP_TIME = 2
     SHOP_NAME = 'МТС'
 
-    def parse_ids(self, start_page=1, end_page=25):
+    def parse_ids(self, start_page=1, end_page=25):  # 25
         page = start_page
         ids = []
         print('Parsing MTS...')
@@ -183,7 +184,7 @@ class MtsParser():
 
             url = f'{self.URL}/catalog/smartfony/{page}'
             headers = {'User-Agent': 'Mozilla/5.0'}
-            r = requests.get(url, headers=headers)
+            r = requests.get(url, headers=headers, proxies=PROXIES)
             parser = BeautifulSoup(r.text, 'html.parser')
             tags = parser.find_all('div', class_='image-right-wrapper')
             ids += [f'{item.find("a")["href"]}' for item in tags]
@@ -200,7 +201,7 @@ class MtsParser():
             return
         url = f'{self.URL}{product_id}'
         headers = {'User-Agent': 'Mozilla/5.0'}
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, proxies=PROXIES)
         parser = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
         name_tag = parser.find('meta', itemprop='name')
         try:
@@ -429,8 +430,8 @@ class MegafonParser():
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        MegafonParser().update_db()
+        # MegafonParser().update_db()
         # TechportParser().update_db()
-        # CitilinkParser().update_db()
+        # CitilinkParser().parse_prices()
         # EldoradoParser().update_db()
-        # MtsParser().update_db()
+        MtsParser().parse_ids()

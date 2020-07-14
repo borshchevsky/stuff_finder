@@ -15,4 +15,6 @@ ITEMS_PER_PAGE = 20
 # MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 # ADMINS = ['3410914@gmail.com']
 
+PROXIES = {'https': 'https://hYTwcY:zvRj7H@193.42.125.20:8000'}
+
 
