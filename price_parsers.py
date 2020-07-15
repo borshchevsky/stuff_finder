@@ -169,107 +169,6 @@ class EldoradoParser():
         print(f'Done. Added {added} queries. Updated {updated} queries')
 
 
-class MtsParser():
-    URL = 'https://shop.mts.ru'
-    SLEEP_TIME = 2
-    SHOP_NAME = 'МТС'
-
-    def parse_ids(self, start_page=1, end_page=25):  # 25
-        page = start_page
-        ids = []
-        print('Parsing MTS...')
-        while page <= end_page:
-            sys.stdout.write('\r')
-            print(f'Page: {page}', end='')
-
-            url = f'{self.URL}/catalog/smartfony/{page}'
-            headers = {'User-Agent': 'Mozilla/5.0'}
-            r = requests.get(url, headers=headers, proxies=PROXIES)
-            parser = BeautifulSoup(r.text, 'html.parser')
-            tags = parser.find_all('div', class_='image-right-wrapper')
-            ids += [f'{item.find("a")["href"]}' for item in tags]
-            page += 1
-            time.sleep(self.SLEEP_TIME)
-
-        print('\n')
-        print(f'Done. {len(ids)} ids collected.\n')
-        return ids
-
-    def get_price(self, product_id):
-        if not product_id:
-            logging.error('ID is not specified.')
-            return
-        url = f'{self.URL}{product_id}'
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        r = requests.get(url, headers=headers, proxies=PROXIES)
-        parser = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
-        name_tag = parser.find('meta', itemprop='name')
-        try:
-            prc = parser.find('meta', itemprop='price')['content']
-        except TypeError:
-            return
-        Price = namedtuple('Price', 'name price external_id')
-        return Price(name_tag['content'], prc, product_id)
-
-    def parse_prices(self):
-        ids = self.parse_ids()
-        print('Parsing prices...')
-        n = 1
-        total = len(ids)
-        prices = []
-        for item in ids:
-            sys.stdout.write('\r')
-            print(f'Got price for {n} of {total} items.', end='')
-            price = self.get_price(item)
-            if not price:
-                continue
-            prices.append(price)
-            n += 1
-            time.sleep(self.SLEEP_TIME)
-        print('\nDone.')
-        return prices
-
-    def update_db(self):
-        prices = self.parse_prices()
-        total_prices = len(prices)
-        n = 0
-        phones = Phone.query.all()
-        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
-        added = 0
-        updated = 0
-        print('\n')
-        print('Updating DB...')
-        for item in prices:
-            n += 1
-            percent_done = round(n / total_prices * 100, 2)
-            sys.stdout.write('\r')
-            print(f'Percent done: {percent_done} %', end='')
-            fuzzed_phones = {}
-
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
-                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
-                if p.price != item.price:
-                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
-                    updated += 1
-            else:
-                for phone in phones:
-                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w > 86:
-                        fuzzed_phones[phone] = ratio_w
-                if fuzzed_phones:
-                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
-                                      external_id=item.external_id)
-                        db.session.add(p)
-                        added += 1
-                else:
-                    continue
-            db.session.commit()
-        print('\n')
-        print(f'Done. Added {added} queries. Updated {updated} queries')
-
-
 class TechportParser():
     URL = 'https://www.techport.ru/katalog/smartfony'
     SLEEP_TIME = 1
@@ -303,6 +202,83 @@ class TechportParser():
             time.sleep(self.SLEEP_TIME)
             page += 1
             offset += page * 28
+
+        print('\n')
+        print(f'Done. {len(prices)} prices collected.')
+        return prices
+
+    def update_db(self):
+        prices = self.parse_prices()
+        total_prices = len(prices)
+        n = 0
+        phones = Phone.query.all()
+        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
+        added = 0
+        updated = 0
+        print('\n')
+        print('Updating DB...')
+        for item in prices:
+            n += 1
+            percent_done = round(n / total_prices * 100, 2)
+            sys.stdout.write('\r')
+            print(f'Percent done: {percent_done} %', end='')
+            fuzzed_phones = {}
+
+            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
+                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
+                if p.price != item.price:
+                    print(type(p.price), type(item.price))
+                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
+                    updated += 1
+            else:
+                for phone in phones:
+                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
+                    if ratio_w > 86:
+                        fuzzed_phones[phone] = ratio_w
+                if fuzzed_phones:
+                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
+                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
+                                      external_id=item.external_id)
+                        db.session.add(p)
+                        added += 1
+                else:
+                    continue
+            db.session.commit()
+        print('\n')
+        print(f'Done. Added {added} queries. Updated {updated} queries')
+
+
+class MtsParser():
+    URL = 'https://shop.mts.ru/catalog/smartfony/'
+    SLEEP_TIME = 1
+    SHOP_NAME = 'МТС'
+    START_PAGE = 1
+    END_PAGE = 25  # 25
+
+    def parse_prices(self):
+        page = self.START_PAGE
+        prices = []
+        Price = namedtuple('Price', 'name price external_id')
+        print('Parsing MTS...')
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        while page <= self.END_PAGE:
+            sys.stdout.write('\r')
+            print(f'Page: {page}', end='')
+            url = f'{self.URL}?page={page}'
+            r = requests.get(url, headers=headers)
+            parser = BeautifulSoup(r.text, 'html.parser')
+            tags = parser.find_all('div', class_='card-product__content')
+            for tag in tags:
+                price = float(''.join(i for i in tag.find('div', class_='hidden-price').text if i.isdigit()))
+                if not price:
+                    continue
+                name_tag = tag.find('div', class_='card-product-description').find('a')
+                name = name_tag['aria-label']
+                external_id = name_tag['href']
+                prices.append(Price(name, price, external_id))
+            time.sleep(self.SLEEP_TIME)
+            page += 1
 
         print('\n')
         print(f'Done. {len(prices)} prices collected.')
@@ -434,4 +410,4 @@ if __name__ == '__main__':
         # TechportParser().update_db()
         # CitilinkParser().parse_prices()
         # EldoradoParser().update_db()
-        MtsParser().parse_ids()
+        MtsParser().update_db()

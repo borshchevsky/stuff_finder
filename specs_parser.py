@@ -30,12 +30,12 @@ class SpecsParser:
             sys.stdout.write('\r')
             print(f'Page: {page}', end='')
 
-            url = f'{self.URL}/catalog/smartfony/{page}'
+            url = f'{self.URL}/catalog/smartfony/?page={page}'
             headers = {'User-Agent': 'Mozilla/5.0'}
             r = requests.get(url, headers=headers)
             parser = BeautifulSoup(r.text, 'html.parser')
-            tags = parser.find_all('div', class_='image-right-wrapper')
-            ids += [f'{item.find("a")["href"]}/specs' for item in tags]
+            tags = parser.find_all('div', class_='card-product__content')
+            ids += [f'{tag.find("div", class_="card-product-description").find("a")["href"]}/specs' for tag in tags]
             page += 1
             time.sleep(self.SLEEP_TIME)
 
@@ -181,4 +181,3 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         SpecsParser().parse_all()
-        # SpecsParser().download_images()
