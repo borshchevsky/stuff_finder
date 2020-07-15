@@ -42,7 +42,7 @@ def index():
         phones = Phone.query.order_by(Phone.views.desc()).paginate(page, ITEMS_PER_PAGE, False)
     elif how == 'price':
         phones = db.session.query(PhoneShop.phone_id, db.func.min(PhoneShop.price).label('min_price')) \
-            .group_by(PhoneShop.phone_id, PhoneShop.price).order_by(PhoneShop.price.desc())\
+            .group_by(PhoneShop.phone_id, PhoneShop.price).order_by(PhoneShop.price.desc()) \
             .paginate(page, ITEMS_PER_PAGE, False)
     else:
         phones = Phone.query.paginate(page, ITEMS_PER_PAGE, False)
@@ -68,6 +68,9 @@ def get_prices(phones):
         prices = [round(shop.price) for shop in phone.shops if shop.price]
         out[phone] = str(min(prices)) if prices else None
     return out
+
+
+
 
 
 @blueprint.route('/specs')

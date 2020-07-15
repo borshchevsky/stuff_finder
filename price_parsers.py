@@ -1,6 +1,7 @@
+from abc import abstractmethod
 from collections import namedtuple
 import json
-import logging
+import smtplib
 import time
 import sys
 
@@ -8,9 +9,65 @@ from bs4 import BeautifulSoup
 import requests
 from fuzzywuzzy import fuzz
 
-from models import db, Phone, PhoneShop, Shop, normalize_name
+from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
 from webapp import create_app
 from webapp.config import PROXIES
+
+
+class BaseParser:
+    SHOP_NAME = ''
+
+    @abstractmethod
+    def parse_prices(self):
+        pass
+
+    def update_db(self):
+        prices = self.parse_prices()
+        total_prices = len(prices)
+        n = 0
+        phones = Phone.query.all()
+        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
+        added = 0
+        updated = 0
+        print('\n')
+        print('Updating DB...')
+        for item in prices:
+            n += 1
+            percent_done = round(n / total_prices * 100, 2)
+            sys.stdout.write('\r')
+            print(f'Percent done: {percent_done} %', end='')
+            fuzzed_phones = {}
+
+            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
+                ps = PhoneShop.query.filter_by(external_id=item.external_id).first()
+                if ps.price != item.price:
+                    p = Phone.query.filter_by(id=ps.phone_id).first()
+                    if item.price < get_min_price(p):
+                        phone_shop_entries = db.session.query(user_phone).filter_by(phone_id=ps.phone_id).all()
+                        emails = [User.query.filter_by(id=entry[0]).first().email for entry in phone_shop_entries]
+                        if emails:
+                            for email in emails:
+                                # TODO сделать через celery
+                                send_mail(email)
+                    PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
+                    updated += 1
+            else:
+                for phone in phones:
+                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
+                    if ratio_w > 86:
+                        fuzzed_phones[phone] = ratio_w
+                if fuzzed_phones:
+                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
+                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
+                        ps = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
+                                      external_id=item.external_id)
+                        db.session.add(ps)
+                        added += 1
+                else:
+                    continue
+            # db.session.commit()
+        print('\n')
+        print(f'Done. Added {added} queries. Updated {updated} queries')
 
 
 class CitilinkParser():
@@ -169,7 +226,7 @@ class EldoradoParser():
         print(f'Done. Added {added} queries. Updated {updated} queries')
 
 
-class TechportParser():
+class TechportParser(BaseParser):
     URL = 'https://www.techport.ru/katalog/smartfony'
     SLEEP_TIME = 1
     SHOP_NAME = 'Техпорт'
@@ -207,54 +264,13 @@ class TechportParser():
         print(f'Done. {len(prices)} prices collected.')
         return prices
 
-    def update_db(self):
-        prices = self.parse_prices()
-        total_prices = len(prices)
-        n = 0
-        phones = Phone.query.all()
-        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
-        added = 0
-        updated = 0
-        print('\n')
-        print('Updating DB...')
-        for item in prices:
-            n += 1
-            percent_done = round(n / total_prices * 100, 2)
-            sys.stdout.write('\r')
-            print(f'Percent done: {percent_done} %', end='')
-            fuzzed_phones = {}
 
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
-                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
-                if p.price != item.price:
-                    print(type(p.price), type(item.price))
-                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
-                    updated += 1
-            else:
-                for phone in phones:
-                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w > 86:
-                        fuzzed_phones[phone] = ratio_w
-                if fuzzed_phones:
-                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
-                                      external_id=item.external_id)
-                        db.session.add(p)
-                        added += 1
-                else:
-                    continue
-            db.session.commit()
-        print('\n')
-        print(f'Done. Added {added} queries. Updated {updated} queries')
-
-
-class MtsParser():
+class MtsParser(BaseParser):
     URL = 'https://shop.mts.ru/catalog/smartfony/'
     SLEEP_TIME = 1
     SHOP_NAME = 'МТС'
     START_PAGE = 1
-    END_PAGE = 25  # 25
+    END_PAGE = 1  # 25
 
     def parse_prices(self):
         page = self.START_PAGE
@@ -284,49 +300,8 @@ class MtsParser():
         print(f'Done. {len(prices)} prices collected.')
         return prices
 
-    def update_db(self):
-        prices = self.parse_prices()
-        total_prices = len(prices)
-        n = 0
-        phones = Phone.query.all()
-        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
-        added = 0
-        updated = 0
-        print('\n')
-        print('Updating DB...')
-        for item in prices:
-            n += 1
-            percent_done = round(n / total_prices * 100, 2)
-            sys.stdout.write('\r')
-            print(f'Percent done: {percent_done} %', end='')
-            fuzzed_phones = {}
 
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
-                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
-                if p.price != item.price:
-                    print(type(p.price), type(item.price))
-                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
-                    updated += 1
-            else:
-                for phone in phones:
-                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w > 86:
-                        fuzzed_phones[phone] = ratio_w
-                if fuzzed_phones:
-                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
-                                      external_id=item.external_id)
-                        db.session.add(p)
-                        added += 1
-                else:
-                    continue
-            db.session.commit()
-        print('\n')
-        print(f'Done. Added {added} queries. Updated {updated} queries')
-
-
-class MegafonParser():
+class MegafonParser(BaseParser):
     URL = 'https://moscow.shop.megafon.ru/mobile'
     SLEEP_TIME = 1
     SHOP_NAME = 'Мегафон'
@@ -361,46 +336,31 @@ class MegafonParser():
         print(f'Done. {len(prices)} prices collected.')
         return prices
 
-    def update_db(self):
-        prices = self.parse_prices()
-        total_prices = len(prices)
-        n = 0
-        phones = Phone.query.all()
-        shop_id = Shop.query.filter_by(name=self.SHOP_NAME).first().id
-        added = 0
-        updated = 0
-        print('\n')
-        print('Updating DB...')
-        for item in prices:
-            n += 1
-            percent_done = round(n / total_prices * 100, 2)
-            sys.stdout.write('\r')
-            print(f'Percent done: {percent_done} %', end='')
-            fuzzed_phones = {}
 
-            if PhoneShop.query.filter_by(external_id=item.external_id, shop_id=shop_id).count():
-                p = PhoneShop.query.filter_by(external_id=item.external_id).first()
-                if p.price != item.price:
-                    print(type(p.price), type(item.price))
-                    PhoneShop.query.filter_by(id=p.id).update({'price': item.price})
-                    updated += 1
-            else:
-                for phone in phones:
-                    ratio_w = fuzz.WRatio(normalize_name(phone.name), normalize_name(item.name))
-                    if ratio_w > 86:
-                        fuzzed_phones[phone] = ratio_w
-                if fuzzed_phones:
-                    closest = max(fuzzed_phones, key=fuzzed_phones.get)
-                    if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
-                        p = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
-                                      external_id=item.external_id)
-                        db.session.add(p)
-                        added += 1
-                else:
-                    continue
-            db.session.commit()
-        print('\n')
-        print(f'Done. Added {added} queries. Updated {updated} queries')
+def get_min_price(phone):
+    return min(shop.price for shop in phone.shops)
+
+
+def send_mail(email):
+    HOST = "smtp.gmail.com"
+    SUBJECT = "Test email from Python"
+    TO = email
+    FROM = "3410914@gmail.com"
+    text = "Python 3.4 rules them all!"
+
+    BODY = "\r\n".join((
+        "From: %s" % FROM,
+        "To: %s" % TO,
+        "Subject: %s" % SUBJECT,
+        "",
+        text
+    ))
+
+    server = smtplib.SMTP(HOST)
+    server.starttls()
+    server.login('3410914', 'iwanttobreakfree1991')
+    server.sendmail(FROM, [TO], BODY)
+    server.quit()
 
 
 if __name__ == '__main__':
