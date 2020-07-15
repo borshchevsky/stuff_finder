@@ -358,7 +358,7 @@ def send_mail(email):
 
     server = smtplib.SMTP(HOST)
     server.starttls()
-    server.login('3410914', 'iwanttobreakfree1991')
+    server.login('3410914', '')
     server.sendmail(FROM, [TO], BODY)
     server.quit()
 
