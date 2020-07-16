@@ -25,30 +25,35 @@ def setup_tasks(sender, **kwargs):
 @celery_app.task
 def update_prices_megafon():
     with flask_app.app_context():
+        import price_parsers
         price_parsers.MegafonParser().update_db()
 
 
 @celery_app.task
 def update_prices_eldorado():
     with flask_app.app_context():
+        import price_parsers
         price_parsers.EldoradoParser().update_db()
 
 
 @celery_app.task
 def update_prices_techport():
     with flask_app.app_context():
+        import price_parsers
         price_parsers.TechportParser().update_db()
 
 
 @celery_app.task
 def update_prices_citilink():
     with flask_app.app_context():
+        import price_parsers
         price_parsers.CitilinkParser().update_db()
 
 
 @celery_app.task
 def update_prices_mts():
     with flask_app.app_context():
+        import price_parsers
         price_parsers.MtsParser().update_db()
 
 
@@ -61,10 +66,12 @@ def send_mail(email):
     msg['Subject'] = Header('price sadad', 'utf-8')
     msg['From'] = 'admin@rattle.one'
     msg['To'] = email
-    msg['Content-Type'] = "text/html; charset=us-ascii"
 
     server = smtplib.SMTP(MAIL_SERVER)
     server.starttls()
     server.login(MAIL_LOGIN, MAIL_PASSWORD)
     server.sendmail(msg['From'], [to], msg.as_string())
     server.quit()
+
+if __name__ == '__main__':
+    send_mail('3410914@gmail.com')

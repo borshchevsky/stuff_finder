@@ -1,4 +1,4 @@
-import smtplib
+from tasks import send_mail
 from abc import abstractmethod
 from collections import namedtuple
 import json
@@ -48,7 +48,6 @@ class BaseParser:
                         phone_shop_entries = db.session.query(user_phone).filter_by(phone_id=ps.phone_id).all()
                         emails = [User.query.filter_by(id=entry[0]).first().email for entry in phone_shop_entries]
                         if emails:
-                            from tasks import send_mail
                             for email in emails:
                                 send_mail.delay(email)
                     PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
