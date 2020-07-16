@@ -4,8 +4,7 @@ from collections import namedtuple
 import json
 import time
 import sys
-from email.header import Header
-from email.mime.text import MIMEText
+
 
 from bs4 import BeautifulSoup
 from celery import Celery
@@ -15,8 +14,6 @@ from fuzzywuzzy import fuzz
 from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
 from webapp import create_app
 from webapp.config import PROXIES, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
-
-celery_app = Celery('tasks', broker='redis://localhost:6379/0')
 
 
 class BaseParser:
