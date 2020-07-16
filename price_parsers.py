@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from collections import namedtuple
 import json
-import smtplib
 import time
 import sys
 
@@ -10,6 +9,7 @@ import requests
 from fuzzywuzzy import fuzz
 
 from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
+from tasks import send_mail
 from webapp import create_app
 from webapp.config import PROXIES
 
@@ -47,8 +47,7 @@ class BaseParser:
                         emails = [User.query.filter_by(id=entry[0]).first().email for entry in phone_shop_entries]
                         if emails:
                             for email in emails:
-                                # TODO сделать через celery
-                                send_mail(email)
+                                send_mail.delay(email, p)
                     PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
                     updated += 1
             else:
@@ -60,7 +59,7 @@ class BaseParser:
                     closest = max(fuzzed_phones, key=fuzzed_phones.get)
                     if not PhoneShop.query.filter_by(phone_id=closest.id, shop_id=shop_id).count():
                         ps = PhoneShop(phone_id=closest.id, shop_id=shop_id, price=item.price,
-                                      external_id=item.external_id)
+                                       external_id=item.external_id)
                         db.session.add(ps)
                         added += 1
                 else:
@@ -341,30 +340,9 @@ def get_min_price(phone):
     return min(shop.price for shop in phone.shops)
 
 
-def send_mail(email):
-    HOST = "smtp.gmail.com"
-    SUBJECT = "Test email from Python"
-    TO = email
-    FROM = "3410914@gmail.com"
-    text = "Python 3.4 rules them all!"
-
-    BODY = "\r\n".join((
-        "From: %s" % FROM,
-        "To: %s" % TO,
-        "Subject: %s" % SUBJECT,
-        "",
-        text
-    ))
-
-    server = smtplib.SMTP(HOST)
-    server.starttls()
-    server.login('3410914', '')
-    server.sendmail(FROM, [TO], BODY)
-    server.quit()
-
-
 if __name__ == '__main__':
     app = create_app()
+    # send_mail('3410914@gmail.com')
     with app.app_context():
         # MegafonParser().update_db()
         # TechportParser().update_db()
