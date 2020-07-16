@@ -23,35 +23,35 @@ def setup_tasks(sender, **kwargs):
 
 @celery_app.task
 def update_prices_megafon():
-    import price_parsers
+    from . import price_parsers
     with flask_app.app_context():
         price_parsers.MegafonParser().update_db()
 
 
 @celery_app.task
 def update_prices_eldorado():
-    import price_parsers
+    from . import price_parsers
     with flask_app.app_context():
         price_parsers.EldoradoParser().update_db()
 
 
 @celery_app.task
 def update_prices_techport():
-    import price_parsers
+    from . import price_parsers
     with flask_app.app_context():
         price_parsers.TechportParser().update_db()
 
 
 @celery_app.task
 def update_prices_citilink():
-    import price_parsers
+    from . import price_parsers
     with flask_app.app_context():
         price_parsers.CitilinkParser().update_db()
 
 
 @celery_app.task
 def update_prices_mts():
-    import price_parsers
+    from . import price_parsers
     with flask_app.app_context():
         price_parsers.MtsParser().update_db()
 
