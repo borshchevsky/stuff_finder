@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask_login import LoginManager
-from flask_mail import Mail
 from flask_migrate import Migrate
 
 from models import db, User, Phone
@@ -13,7 +12,6 @@ def create_app():
     app.config.from_pyfile('config.py')
     db.init_app(app)
     migrate = Migrate(app, db)
-    mail = Mail(app)
     login = LoginManager(app)
     login.login_view = 'user.login'
     login.login_message = 'Для доступа к этой странице необходимо войти на сайт.'

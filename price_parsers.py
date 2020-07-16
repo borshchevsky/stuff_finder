@@ -1,17 +1,22 @@
+import smtplib
 from abc import abstractmethod
 from collections import namedtuple
 import json
 import time
 import sys
+from email.header import Header
+from email.mime.text import MIMEText
 
 from bs4 import BeautifulSoup
+from celery import Celery
 import requests
 from fuzzywuzzy import fuzz
 
 from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
-from tasks import send_mail
 from webapp import create_app
-from webapp.config import PROXIES
+from webapp.config import PROXIES, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
+
+celery_app = Celery('price_parsers', broker='redis://localhost:6379/0')
 
 
 class BaseParser:
@@ -338,6 +343,24 @@ class MegafonParser(BaseParser):
 
 def get_min_price(phone):
     return min(shop.price for shop in phone.shops)
+
+
+@celery_app.task
+def send_mail(email, phone):
+    to = email
+    body = f'Цена на {phone.name} из Вашего избранного снизилась!'
+
+    msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
+    msg['Subject'] = Header('price sadad', 'utf-8')
+    msg['From'] = 'admin@rattle.one'
+    msg['To'] = email
+    msg['Content-Type'] = "text/html; charset=us-ascii"
+
+    server = smtplib.SMTP(MAIL_SERVER)
+    server.starttls()
+    server.login(MAIL_LOGIN, MAIL_PASSWORD)
+    server.sendmail(msg['From'], [to], msg.as_string())
+    server.quit()
 
 
 if __name__ == '__main__':

@@ -1,13 +1,8 @@
-import smtplib
-from email.header import Header
-from email.mime.text import MIMEText
-
 from celery import Celery
 from celery.schedules import crontab
 
 from webapp import create_app
 import price_parsers
-from webapp.config import MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
 
 flask_app = create_app()
 celery_app = Celery('tasks', broker='redis://localhost:6379/0')
@@ -52,19 +47,3 @@ def update_prices_mts():
         price_parsers.MtsParser().update_db()
 
 
-@celery_app.task
-def send_mail(email, phone):
-    to = email
-    body = f'Цена на {phone.name} из Вашего избранного снизилась!'
-
-    msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
-    msg['Subject'] = Header('price sadad', 'utf-8')
-    msg['From'] = 'admin@rattle.one'
-    msg['To'] = email
-    msg['Content-Type'] = "text/html; charset=us-ascii"
-
-    server = smtplib.SMTP(MAIL_SERVER)
-    server.starttls()
-    server.login(MAIL_LOGIN, MAIL_PASSWORD)
-    server.sendmail(msg['From'], [to], msg.as_string())
-    server.quit()
