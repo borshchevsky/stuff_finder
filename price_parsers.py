@@ -16,7 +16,7 @@ from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
 from webapp import create_app
 from webapp.config import PROXIES, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
 
-celery_app = Celery('price_parsers', broker='redis://localhost:6379/0')
+celery_app = Celery('tasks', broker='redis://localhost:6379/0')
 
 
 class BaseParser:
@@ -51,8 +51,9 @@ class BaseParser:
                         phone_shop_entries = db.session.query(user_phone).filter_by(phone_id=ps.phone_id).all()
                         emails = [User.query.filter_by(id=entry[0]).first().email for entry in phone_shop_entries]
                         if emails:
+                            from tasks import send_mail
                             for email in emails:
-                                send_mail.delay(email, p)
+                                send_mail.delay(email)
                     PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
                     updated += 1
             else:
@@ -345,22 +346,7 @@ def get_min_price(phone):
     return min(shop.price for shop in phone.shops)
 
 
-@celery_app.task
-def send_mail(email, phone):
-    to = email
-    body = f'Цена на {phone.name} из Вашего избранного снизилась!'
 
-    msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
-    msg['Subject'] = Header('price sadad', 'utf-8')
-    msg['From'] = 'admin@rattle.one'
-    msg['To'] = email
-    msg['Content-Type'] = "text/html; charset=us-ascii"
-
-    server = smtplib.SMTP(MAIL_SERVER)
-    server.starttls()
-    server.login(MAIL_LOGIN, MAIL_PASSWORD)
-    server.sendmail(msg['From'], [to], msg.as_string())
-    server.quit()
 
 
 if __name__ == '__main__':
