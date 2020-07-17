@@ -1,15 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if not phones%}
+{% if not phones %}
     Список избранных пуст.
 {% else %}
-    {% for phone in phones %}
-        <a href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
-        <div align="right">
-            <a href="{{ url_for('user.favorites', phone_id=phone.id, action='del') }}">Удалить</a>
-        </div>
-    {% endfor %}
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Название</th>
+            <th scope="col">Цена, ₽</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for phone in phones %}
+        <tr>
+            <td style="max-width:20px;">
+                <div align="center">
+                    <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
+                </div>
+            </td>
+            <td align="" style="width:800px;padding-left:50px;vertical-align:middle;">
+                <p>
+                    <a style="font-size:16px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name
+                        }} </a>
+                </p>
+                <p>
+                    <a style="font-size:11px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}">
+                        <i>
+                            Экран {{ phone.screen_size }}"
+                            {% if phone.ram %}
+                            , {{ phone.ram }} оперативной памяти
+                            {% endif %}
+                            {% if phone.main_cam_resolution %}
+                            , камера {{ phone.main_cam_resolution }}
+                            {% endif %}
+                        </i>
+                    </a>
+                </p>
+            </td>
+            <td style="vertical-align:middle;font-size:15px;">
+                {% if phones[phone] %}
+                {% set ph = phones[phone]|string %}
+                <strong>{{ ph[:ph|length - 3] + ' ' + ph[-3:] }}</strong>
+                {% endif %}
+            </td>
+            {% if current_user.is_authenticated %}
+            <td style="vertical-align:middle;"><a href="{{ url_for('user.favorites', phone_id=phone.id, action='del') }}">Удалить</a>
+            </td>
+            {% endif %}
+        </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
 {% endif %}
 
 {% endblock %}

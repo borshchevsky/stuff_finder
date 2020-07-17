@@ -1,93 +1,106 @@
 {% extends 'base.html' %}
+
 {% block content %}
-{% if current_user.is_authenticated %}
-<div align="right">
-    <a href="{{ url_for('user.favorites') }}">Избранное</a>
-</div>
-{% endif %}
+<hr>
+<div style="padding-top:50px;">
+    {% if current_user.is_authenticated %}
+        <div align="right">
+            <a href="{{ url_for('user.favorites') }}">❤ Избранное</a>
+        </div>
+    {% endif %}
 
-{% include 'main/search.html' %}
-
-{% if not nothing_found %}
-
-
-    <div class="p-t-20">
-
+    {% if not nothing_found %}
+        <div class="p-t-20" style="padding-bottom:15px;">
                 {% if prev_url %}
-            {% if how %}
-                <a href="{{ prev_url }}&how={{ how }}">Предыдущая страница</a>
-            {% else %}
-                <a href="{{ prev_url }}">Предыдущая страница </a>
+                    {% if how %}
+                        <a href="{{ prev_url }}&how={{ how }}">Предыдущая страница</a>
+                    {% else %}
+                        <a href="{{ prev_url }}">Предыдущая страница </a>
+                {% endif %}
             {% endif %}
-        {% endif %}
-        {% if prev_url and next_url %}
-            |
+            {% if prev_url and next_url %}
+                |
+            {% endif %}
+            {% if next_url %}
+                {% if how %}
+                    <a href="{{ next_url }}&how={{ how }}">Следующая страница</a>
+                {% else %}
+                    <a href="{{ next_url }}">Следующая страница</a>
+                {% endif%}
+            {% endif %}
+            <span style="float:right;">
+                <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='pop') }}" style="font-size:12px;">По популярности</a>
+            <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='price') }}" style="font-size:12px;">По цене</a>
+                </span>
+        </div>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Название</th>
+                <th scope="col">Цена, ₽</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for phone in phones %}
+            <tr>
+                <td style="max-width:20px;">
+                    <div align="center">
+                        <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
+                    </div>
+                </td>
+                <td align="" style="width:800px;padding-left:50px;vertical-align:middle;">
+                    <p>
+                        <a style="font-size:16px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
+                    </p>
+                    <p>
+                        <a style="font-size:11px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}">
+                            <i>
+                                Экран {{ phone.screen_size }}"
+                                {% if phone.ram %}
+                                    , {{ phone.ram }} оперативной памяти
+                                {% endif %}
+                                {% if phone.main_cam_resolution %}
+                                    , камера {{ phone.main_cam_resolution }}
+                                {% endif %}
+                            </i>
+                        </a>
+                    </p>
+                </td>
+                <td style="vertical-align:middle;font-size:15px;">
+                    {% if phones[phone] %}
+                        {% set ph = phones[phone]|string %}
+                        <strong>{{ ph[:ph|length - 3] + ' ' + ph[-3:] }}</strong>
+                    {% endif %}
+                </td>
+                {% if current_user.is_authenticated %}
+                    <td style="vertical-align:middle;"><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}" title="Добавить в избранное">+</a></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if prev_url %}
+            <a href="{{ prev_url }}">Предыдущая страница | </a>
         {% endif %}
         {% if next_url %}
-            {% if how %}
-                <a href="{{ next_url }}&how={{ how }}">Следующая страница</a>
-            {% else %}
-                <a href="{{ next_url }}">Следующая страница</a>
-            {% endif%}
+            <a href="{{ next_url }}">Следующая страница</a>
         {% endif %}
-        <span style="float:right;">
-        <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='pop') }}" style="font-size:12px;border-radius:0%;">По популярности</a>
-        <a class="btn btn-outline-primary" href="{{ url_for('main.index', how='price') }}" style="font-size:12px;border-radius:0%;">По цене</a>
-            </span>
-    </div>
-<br>
-
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th scope="col"></th>
-            <th scope="col">Название</th>
-            <th scope="col">Цена, ₽</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for phone in phones %}
-        <tr>
-            <td style="max-width:20px;">
-                <div align="center">
-                    <img height="60" src="static/{{phone.name.replace('/', '')}} 1.jpg" alt="">
-                </div>
-            </td>
-            <td align="" style="width:800px;padding-left:50px;vertical-align:middle;">
-                <a style="font-size:16px;" href="{{ url_for('main.show_specs', phone_id=phone.id) }}"> {{ phone.name }} </a>
-            </td>
-            <td style="vertical-align:middle;font-size:15px;">
-                {% if phones[phone] %}
-                    {% set ph = phones[phone]|string %}
-                    <strong>{{ ph[:ph|length - 3] + ' ' + ph[-3:] }}</strong>
-                {% endif %}
-            </td>
-            {% if current_user.is_authenticated %}
-                <td style="vertical-align:middle;"><a href="{{ url_for('user.favorites', phone_id=phone.id, action='add') }}" title="Добавить в избранное">+</a></td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% if prev_url %}
-        <a href="{{ prev_url }}">Предыдущая страница | </a>
+    <br>
+    <br>
+    <br>
+    {% else %}
+        <br>
+        <br>
+        <div align="center">
+            <img style="width:500px;" src="https://i.gyazo.com/f7cf40e4758b2d26cf1d223c024dae81.png" alt="">
+        </div>
+        <br>
+        <br>
+        <h5 align="center">Ничего не найдено :(</h5>
     {% endif %}
-    {% if next_url %}
-        <a href="{{ next_url }}">Следующая страница</a>
-    {% endif %}
-<br>
-<br>
-<br>
-{% else %}
-    <br>
-    <br>
-    <div align="center">
-        <img style="width:500px;" src="https://i.gyazo.com/f7cf40e4758b2d26cf1d223c024dae81.png" alt="">
-    </div>
-    <br>
-    <br>
-    <h5 align="center">Ничего не найдено :(</h5>
-{% endif %}
+</div>
 {% endblock %}
 
 

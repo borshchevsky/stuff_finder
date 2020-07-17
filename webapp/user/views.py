@@ -4,6 +4,7 @@ from werkzeug.urls import url_parse
 
 from models import db, User, user_phone, Phone
 from webapp.user.forms import LoginForm, RegistrationForm
+from webapp.main.views import get_prices
 
 blueprint = Blueprint('user', __name__)
 
@@ -73,7 +74,7 @@ def favorites():
     user_phone_queries = db.session.query(user_phone).filter_by(user_id=user_id).all()
     phone_ids = [phone_id for _, phone_id in user_phone_queries]
     phones = [Phone.query.filter_by(id=phone_id).first() for phone_id in phone_ids]
-    return render_template('user/favorites.html', title='Избранное', phones=phones)
+    return render_template('user/favorites.html', title='Избранное', phones=get_prices(phones))
 
 
 @blueprint.route('/login_test')

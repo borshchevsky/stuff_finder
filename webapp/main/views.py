@@ -10,7 +10,7 @@ blueprint = Blueprint('main', __name__)
 @blueprint.route('/')
 @blueprint.route('/index')
 def index():
-    title = 'Stuff Finder'
+    title = 'Смартфоны'
     text = request.args.get('search')
     how = request.args.get('how')
     nothing_found = True
@@ -70,9 +70,6 @@ def get_prices(phones):
     return out
 
 
-
-
-
 @blueprint.route('/specs')
 def show_specs():
     phone_id = request.args.get('phone_id', None)
@@ -96,3 +93,8 @@ def show_specs():
     if not prices:
         prices = [[], [], []]
     return render_template('main/specs.html', phone=phone, prices=prices, page_title=phone.name)
+
+
+@blueprint.route('/about')
+def about():
+    return render_template('main/about.html')

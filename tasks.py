@@ -14,13 +14,14 @@ flask_app = create_app()
 celery_app = Celery('tasks', broker='redis://localhost:6379/0')
 mail = Mail(flask_app)
 
+
 @celery_app.on_after_configure.connect
 def setup_tasks(sender, **kwargs):
-    sender.add_periodic_task(crontab(hour='*/5'), update_prices_megafon.s())
-    sender.add_periodic_task(crontab(hour='*/5'), update_prices_eldorado.s())
-    sender.add_periodic_task(crontab(hour='*/5'), update_prices_techport.s())
-    # sender.add_periodic_task(crontab(hour='*/5'), update_prices_citilink.s())
-    sender.add_periodic_task(crontab(hour='*/5'), update_prices_mts.s())
+    sender.add_periodic_task(crontab(minute=0, hour='*/5'), update_prices_megafon.s())
+    sender.add_periodic_task(crontab(minute=0, hour='*/5'), update_prices_eldorado.s())
+    sender.add_periodic_task(crontab(minute=0, hour='*/5'), update_prices_techport.s())
+    sender.add_periodic_task(crontab(minute=0, hour='*/5'), update_prices_citilink.s())
+    sender.add_periodic_task(crontab(minute=0, hour='*/5'), update_prices_mts.s())
 
 
 @celery_app.task

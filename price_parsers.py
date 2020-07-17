@@ -67,7 +67,7 @@ class BaseParser:
                         added += 1
                 else:
                     continue
-            # db.session.commit()
+            db.session.commit()
         print('\n')
         print(f'Done. Added {added} queries. Updated {updated} queries')
 
@@ -272,7 +272,7 @@ class MtsParser(BaseParser):
     SLEEP_TIME = 1
     SHOP_NAME = 'МТС'
     START_PAGE = 1
-    END_PAGE = 1  # 25
+    END_PAGE = 25  # 25
 
     def parse_prices(self):
         page = self.START_PAGE
