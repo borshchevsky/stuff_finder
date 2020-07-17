@@ -9,9 +9,15 @@ SECRET_KEY = 'iyvuiYV*V*v8yv8iYV*(7g0bh09'
 ITEMS_PER_PAGE = 20
 
 MAIL_SERVER = 'smtp.mail.ru'
-MAIL_LOGIN = 'admin@rattle.one'
+MAIL_USERNAME = 'admin@rattle.one'
 MAIL_PASSWORD = 'passwd'
+
+SENDER = 'admin@rattle.one'
+SUBJ_FOR_EMAIL = 'Цена снизилась!'
 
 PROXIES = {'https': 'https://hYTwcY:zvRj7H@193.42.125.20:8000'}
 
+MAIL_PORT = 25
+MAIL_USE_TLS = True
+MAIL_USE_SSL = False
 

@@ -13,7 +13,7 @@ from fuzzywuzzy import fuzz
 
 from models import db, Phone, PhoneShop, Shop, User, user_phone, normalize_name
 from webapp import create_app
-from webapp.config import PROXIES, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
+from webapp.config import PROXIES
 
 
 class BaseParser:
@@ -50,7 +50,7 @@ class BaseParser:
                         if emails:
                             from tasks import send_mail
                             for email in emails:
-                                send_mail.delay(email)
+                                send_mail.delay(email, p)
                     PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
                     updated += 1
             else:

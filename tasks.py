@@ -4,14 +4,15 @@ from email.mime.text import MIMEText
 
 from celery import Celery
 from celery.schedules import crontab
+from flask_mail import Mail, Message
 
 from webapp import create_app
 import price_parsers
-from webapp.config import MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
+from webapp.config import SENDER, SUBJ_FOR_EMAIL
 
 flask_app = create_app()
 celery_app = Celery('tasks', broker='redis://localhost:6379/0')
-
+mail = Mail(flask_app)
 
 @celery_app.on_after_configure.connect
 def setup_tasks(sender, **kwargs):
@@ -53,20 +54,11 @@ def update_prices_mts():
 
 
 @celery_app.task
-def send_mail(email):
-    to = email
-    body = f'asd'
+def send_mail(email, phone):
+    msg = Message(subject=SUBJ_FOR_EMAIL, recipients=[email], sender=SENDER)
+    msg.body = f'Цена на {phone.name} из Вашего избранного снизилась!'
+    mail.send(msg)
 
-    msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
-    msg['Subject'] = Header('price sadad', 'utf-8')
-    msg['From'] = 'admin@rattle.one'
-    msg['To'] = email
-
-    server = smtplib.SMTP(MAIL_SERVER)
-    server.starttls()
-    server.login(MAIL_LOGIN, MAIL_PASSWORD)
-    server.sendmail(msg['From'], [to], msg.as_string())
-    server.quit()
 
 if __name__ == '__main__':
     send_mail('3410914@gmail.com')
