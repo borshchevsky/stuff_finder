@@ -50,7 +50,7 @@ class BaseParser:
                         if emails:
                             from tasks import send_mail
                             for email in emails:
-                                send_mail.delay(email, p)
+                                send_mail.delay(email, p.name)
                     PhoneShop.query.filter_by(id=ps.id).update({'price': item.price})
                     updated += 1
             else:

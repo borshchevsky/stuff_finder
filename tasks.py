@@ -54,10 +54,11 @@ def update_prices_mts():
 
 
 @celery_app.task
-def send_mail(email, phone):
-    msg = Message(subject=SUBJ_FOR_EMAIL, recipients=[email], sender=SENDER)
-    msg.body = f'Цена на {phone.name} из Вашего избранного снизилась!'
-    mail.send(msg)
+def send_mail(email, phone_name):
+    with flask_app.app_context():
+        msg = Message(subject=SUBJ_FOR_EMAIL, recipients=[email], sender=SENDER)
+        msg.body = f'Цена на {phone_name} из Вашего избранного снизилась!'
+        mail.send(msg)
 
 
 if __name__ == '__main__':
