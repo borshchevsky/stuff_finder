@@ -21,12 +21,12 @@
 ```sh
 $ git clone https://github.com/PavelBorsh/stuff_finder.git
 $ cd stuff_finder
-$ python3 venv -m env
+$ python3 -m venv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
 
-Установка PostgreSQL
+### Установка PostgreSQL
 
 ```sh
 $ sudo apt update
@@ -59,15 +59,24 @@ $ CREATE DATABASE имя_базы
 - В файле postgresql.conf (по умолчанию находится в /etc/postgresql/...) прописать: listen_addresses = '*'
 - host all             all             0.0.0.0/0            md5
 
-### Запуск приложения
+### Добавление магазинов, парсинг цен и характеристик.
 
-Установка Redis.
+Перед запуском приложения необходимо создать записи магазинов в базе данных и спарсить характеристики смартфонов. Характеристики парсятся с сайта МТС
+
+```sh
+$ python add_shops.py
+$ python parse_specs.py
+
+```
+
+Теперь можно либо спарсить цены, либо запустить Celery и дождаться пока Celery запустит задания парсинга цен.
+
+### Запуск приложения.
 
 ```sh
 $ export FLASK_APP=webapp
 $ flask run
 ```
-
 ### Настройка и запуск Celery
 
 Установка Redis.
