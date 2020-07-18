@@ -38,8 +38,8 @@
             <thead>
             <tr>
                 <th scope="col"></th>
-                <th scope="col">Название</th>
-                <th scope="col">Цена, ₽</th>
+                <th style="padding-left:200px;" scope="col">Модель</th>
+                <th style="text-align:center;" scope="col">Цена, ₽</th>
             </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@
                         </a>
                     </p>
                 </td>
-                <td style="vertical-align:middle;font-size:15px;">
+                <td style="text-align:center;vertical-align:middle;font-size:15px;">
                     {% if phones[phone] %}
                         {% set ph = phones[phone]|string %}
                         <strong>{{ ph[:ph|length - 3] + ' ' + ph[-3:] }}</strong>

@@ -93,8 +93,5 @@ $ sudo systemctl start redis-server
 $ celery -A tasks  worker -B --loglevel=info -f celery.log
 ```
 
-[//]:
-
-
    [rttl]: <http://rattle.one>
   
