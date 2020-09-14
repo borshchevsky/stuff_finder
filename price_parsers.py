@@ -341,17 +341,3 @@ class MegafonParser(BaseParser):
 
 def get_min_price(phone):
     return min(shop.price for shop in phone.shops)
-
-
-
-
-
-if __name__ == '__main__':
-    app = create_app()
-    # send_mail('3410914@gmail.com')
-    with app.app_context():
-        # MegafonParser().update_db()
-        # TechportParser().update_db()
-        # CitilinkParser().parse_prices()
-        # EldoradoParser().update_db()
-        MtsParser().update_db()
