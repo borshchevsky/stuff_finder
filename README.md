@@ -61,6 +61,7 @@ $ CREATE DATABASE имя_базы
 - в postgresql.conf: listen_addresses = '*'
 - в pg_hba.conf прописать: host all             all             0.0.0.0/0            md5
 
+
 ### Создание таблиц в базе.
 
 ```sh
