@@ -61,6 +61,3 @@ def send_mail(email, phone_name):
         msg.body = f'Цена на {phone_name} из Вашего избранного снизилась!'
         mail.send(msg)
 
-
-if __name__ == '__main__':
-    send_mail('3410914@gmail.com')
