@@ -145,7 +145,3 @@ def normalize_name(name):
         index = result.lower().find('gb')
         result = result[:index] + ' ' + result[index:]
     return result
-
-
-if __name__ == '__main__':
-    print(generate_password_hash('asd'))
