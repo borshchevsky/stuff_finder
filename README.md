@@ -7,8 +7,6 @@
   - Эльдорадо
   - Технопорт
 
-Рабочую версию можно протестировать по адресу: [www.rattle.one][rttl]
-
 
 ### Установка
 
@@ -102,6 +100,4 @@ $ sudo systemctl start redis-server
 ```sh
 $ celery -A tasks  worker -B --loglevel=info -f celery.log
 ```
-
-   [rttl]: <http://rattle.one>
   
